@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع اسأل - تحدي المستويات</title>
+    
+    <style>
+        /* --- أسلوب التصميم (CSS) --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a202c;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+            box-sizing: border-box;
+        }
+
+        .quiz-container {
+            background-color: #2d3748;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 650px;
+            text-align: center;
+            box-sizing: border-box;
+            border: 1px solid #4a5568;
+        }
+
+        h1 {
+            color: #63b3ed;
+            margin: 0 0 0.5rem 0;
+            font-size: 3rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .welcome-text {
+            color: #cbd5e0;
+            font-size: 1.15rem;
+            line-height: 1.8;
+            margin: 1.5rem 0 2.5rem 0;
+            text-align: right;
+            background: #1a202c;
+            padding: 20px;
+            border-radius: 12px;
+            border-right: 5px solid #63b3ed;
+        }
+
+        /* شارات المستويات الخمسة */
+        .level-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        .lvl-0 { background-color: #38a169; color: white; } 
+        .lvl-1 { background-color: #3182ce; color: white; } 
+        .lvl-2 { background-color: #dd6b20; color: white; } 
+        .lvl-3 { background-color: #e53e3e; color: white; } 
+        .lvl-4 { background-color: #805ad5; color: white; animation: pulse 1.5s infinite; } 
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* العداد (التايمر) */
+        .timer-box {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #e53e3e;
+            background: #742a2a;
+            width: 60px;
+            height: 60px;
+            line-height: 60px;
+            border-radius: 50%;
+            margin: 10px auto 20px auto;
+            border: 3px solid #e53e3e;
+            box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
+        }
+
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            color: #cbd5e0;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            background: #1a202c;
+            padding: 8px 15px;
+            border-radius: 10px;
+        }
+
+        .question-box {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            min-height: 70px;
+            line-height: 1.6;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .option-btn {
+            background-color: #4a5568;
+            border: 2px solid #718096;
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-size: 1.15rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: right;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .option-btn:hover {
+            background-color: #2b6cb0;
+            border-color: #63b3ed;
+        }
+
+        /* أزرار التحكم (ابدأ / إعادة) */
+        .action-btn {
+            background-color: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 45px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+        }
+
+        .action-btn:hover {
+            background-color: #38a169;
+            transform: translateY(-2px);
+        }
+
+        /* إخفاء الصناديق الافتراضية */
+        .hidden {
+            display: none !important;
+        }
+
+        .result-score {
+            font-size: 2.5rem;
+            color: #48bb78;
+            font-weight: bold;
+            margin: 2rem 0;
+            background: #1c4532;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px dashed #48bb78;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+        <h1>اسأل</h1>
+
+        <div id="start-screen">
+            <div class="welcome-text">
+                <strong>مرحباً بك في تحدي مسابقة "اسأل" الكبرى! 👋</strong><br><br>
+                قوانين التحدي بسيطة ولكنها تحتاج إلى تركيز شديد:<br>
+                💡 ستقوم بالإجابة على <strong>30 سؤالاً</strong> متنوعاً.<br>
+                📈 تنقسم المسابقة إلى <strong>5 مستويات متدرجة الصعوبة</strong> (سهل، هاوي، متوسط، صعب، ومستحيل).<br>
+                ⏱️ لديك <strong>7 ثوانٍ فقط</strong> للإجابة على كل سؤال!<br>
+                🎯 تبدأ برصيد <strong>30 درجة كاملة</strong>، كل إجابة خاطئة أو انتهاء للوقت سيخصم منك درجة واحدة.<br><br>
+                هل أنت مستعد لاختبار معلوماتك؟ اضغط على الزر أدناه للانطلاق!
+            </div>
+            <button class="action-btn" onclick="startQuiz()">ابدأ التحدي الآن 🚀</button>
+        </div>
+
+        <div id="quiz-box" class="hidden">
+            <div id="level-title" class="level-badge lvl-0">المستوى: سهل</div>
+            <div class="timer-box" id="timer">7</div>
+            
+            <div class="info-bar">
+                <span id="progress">السؤال: 1 / 30</span>
+                <span id="live-score">الدرجة الحالية: 30 / 30</span>
+            </div>
+
+            <div class="question-box" id="question">جاري التحميل...</div>
+            <div class="options-container" id="options"></div>
+        </div>
+
+        <div id="result-box" class="hidden">
+            <h2>🎉 انتهى التحدي الكبير!</h2>
+            <p style="font-size: 1.3rem; color: #cbd5e0;">مجموع درجاتك النهائي الذي حافظت عليه هو:</p>
+            <div class="result-score" id="score-text">30 / 30</div>
+            <button class="action-btn" style="background-color: #3182ce; box-shadow: 0 4px 12px rgba(49, 130, 206, 0.3);" onclick="restartQuiz()">تحدي جديد 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        // بنك الأسئلة مقسم إلى 5 مستويات (كل مستوى 6 أسئلة = الإجمالي 30 سؤال)
+        const quizData = [
+            // === المستوى 1: سهل ===
+            { q: "ما هي عاصمة مصر؟", o: ["الإسكندرية", "القاهرة", "الجيزة", "أسوان"], c: 1, lvl: "سهل", lvlIdx: 0 },
+            { q: "ما هو لون السماء في يوم صافٍ؟", o: ["أخضر", "أحمر", "أزرق", "أصفر"], c: 2, lvl: "سهل", lvlIdx: 0 },
+            { q: "كم عدد ألوان قوس قزح؟", o: ["5 ألوان", "6 ألوان", "7 ألوان", "8 ألوان"], c: 2, lvl: "سهل", lvlIdx: 0 },
+            { q: "أي حيوان يلقب بـ ملك الغابة؟", o: ["الفهد", "الذئب", "الأسد", "النمر"], c: 2, lvl: "سهل", lvlIdx: 0 },
+            { q: "ما هو الشيء الذي تراه في الليل 3 مرات وفي النهار مرة واحدة؟", o: ["حرف النون", "القمر", "النجوم", "الشمس"], c: 0, lvl: "سهل", lvlIdx: 0 },
+            { q: "كم ساعة في اليوم الواحد؟", o: ["12 ساعة", "24 ساعة", "30 ساعة", "48 ساعة"], c: 1, lvl: "سهل", lvlIdx: 0 },
+
+            // === المستوى 2: هاوي ===
+            { q: "ما هو أطول نهر في العالم? ", o: ["الأمازون", "الميسيسيبي", "الدانوب", "النيل"], c: 3, lvl: "هاوي", lvlIdx: 1 },
+            { q: "ما هو الكوكب الأحمر؟", o: ["عطارد", "المريخ", "الزهرة", "زحل"], c: 1, lvl: "هاوي", lvlIdx: 1 },
+            { q: "ما هو أكبر المحيطات في العالم؟", o: ["الهندي", "الأطلسي", "الهادئ", "المتمد الشمالي"], c: 2, lvl: "هاوي", lvlIdx: 1 },
+            { q: "في أي قارة تقع دولة البرازيل؟", o: ["آسيا", "أفريقيا", "أوروبا", "أمريكا الجنوبية"], c: 3, lvl: "هاوي", lvlIdx: 1 },
+            { q: "كم عدد لاعبي فريق كرة القدم الأساسيين داخل الملعب؟", o: ["9 لاعبين", "10 لاعبين", "11 لاعباً", "12 لاعباً"], c: 2, lvl: "هاوي", lvlIdx: 1 },
+            { q: "ما هو العنصر الأساسي لصناعة الزجاج؟", o: ["الخشب", "الرمل", "الحديد", "البلاستيك"], c: 1, lvl: "هاوي", lvlIdx: 1 },
+
+            // === المستوى 3: متوسط ===
+            { q: "ما هو الكائن الحي الذي يمتلك 3 قلوب؟", o: ["الأخطبوط", "الحوت الأزرق", "الدلفين", "قنديل البحر"], c: 0, lvl: "متوسط", lvlIdx: 2 },
+            { q: "من هو مخترع المصباح الكهربائي؟", o: ["تسلا", "توماس إديسون", "غراهام بيل", "نيوتن"], c: 1, lvl: "متوسط", lvlIdx: 2 },
+            { q: "كم عدد أسنان الشخص البالغ؟", o: ["28 سناً", "32 سناً", "30 سناً", "36 سناً"], c: 1, lvl: "متوسط", lvlIdx: 2 },
+            { q: "ما هي عاصمة اليابان؟", o: ["بكين", "سيول", "طوكيو", "بانكوك"], c: 2, lvl: "متوسط", lvlIdx: 2 },
+            { q: "أي غاز يمثل النسبة الأكبر في الغلاف الجوي للأرض؟", o: ["الأكسجين", "النيتروجين", "الهيدروجين", "الأرجون"], c: 1, lvl: "متوسط", lvlIdx: 2 },
+            { q: "ما هو المعدن السائل الوحيد في درجة الحرارة العادية؟", o: ["الحديد", "الذهب", "النحاس", "الزئبق"], c: 3, lvl: "متوسط", lvlIdx: 2 },
+
+            // === المستوى 4: صعب ===
+            { q: "ما هي أصغر دولة في العالم من حيث المساحة؟", o: ["موناكو", "الفاتيكان", "سان مارينو", "المالديف"], c: 1, lvl: "صعب", lvlIdx: 3 },
+            { q: "كم عدد عظام جسم الإنسان البالغ؟", o: ["206 عظمة", "212 عظمة", "198 عظمة", "300 عظمة"], c: 0, lvl: "صعب", lvlIdx: 3 },
+            { q: "في أي عام اندلعت الحرب العالمية الأولى؟", o: ["1914", "1918", "1939", "1945"], c: 0, lvl: "صعب", lvlIdx: 3 },
+            { q: "ما هو لون دم حيوان الكركند (الاستاكوزا)؟", o: ["أحمر", "شفاف", "أزرق", "أخضر"], c: 2, lvl: "صعب", lvlIdx: 3 },
+            { q: "ما هي الدولة التي تمتلك أكبر عدد من الجزر في العالم؟", o: ["إندونيسيا", "الفلبين", "السويد", "اليونان"], c: 2, lvl: "صعب", lvlIdx: 3 },
+            { q: "ما هو العضو الوحيد في جسم الإنسان الذي يمكنه إعادة النمو بعد قطع جزء منه؟", o: ["الرئة", "الكبد", "الكلية", "البنكرياس"], c: 1, lvl: "صعب", lvlIdx: 3 },
+
+            // === المستوى 5: مستحيل ===
+            { q: "ما هو الكوكب الأكثر سخونة في المجموعة الشمسية؟", o: ["عطارد", "الزهرة", "المريخ", "المشتري"], c: 1, lvl: "مستحيل", lvlIdx: 4 },
+            { q: "كم عدد الغدد العرقية في جسم الإنسان تقريباً؟", o: ["500 ألف", "مليون", "2.5 مليون", "5 ملايين"], c: 2, lvl: "مستحيل", lvlIdx: 4 },
+            { q: "ما هو الحيوان الذي لا ينام أبداً منذ ولادته وحتى موته؟", o: ["القرش الإسفنجي", "سمكة القرش الثور", "الضفدع الثور", "النمل الأرجنتيني"], c: 2, lvl: "مستحيل", lvlIdx: 4 },
+            { q: "ما هي الدولة الإفريقية الوحيدة التي لم تُستعمر قط في تاريخها؟", o: ["إثيوبيا", "ليبيريا", "مصر", "جنوب أفريقيا"], c: 0, lvl: "مستحيل", lvlIdx: 4 },
+            { q: "أي من العناصر التالية يحتوي على أعلى نقطة انصهار؟", o: ["البلاتين", "التنجستن", "الماس", "الكروم"], c: 1, lvl: "مستحيل", lvlIdx: 4 },
+            { q: "ما هي أسرع العضلات حركةً في جسم الإنسان؟", o: ["عضلة القلب", "عضلة العين", "عضلة اللسان", "عضلة الفخذ"], c: 1, lvl: "مستحيل", lvlIdx: 4 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 30; 
+        let timeLeft = 7; 
+        let timerInterval; 
+
+        // عناصر الواجهة
+        const startScreen = document.getElementById("start-screen");
+        const quizBox = document.getElementById("quiz-box");
+        const resultBox = document.getElementById("result-box");
+        
+        const questionElement = document.getElementById("question");
+        const optionsContainer = document.getElementById("options");
+        const progressElement = document.getElementById("progress");
+        const liveScoreElement = document.getElementById("live-score");
+        const levelTitleElement = document.getElementById("level-title");
+        const timerElement = document.getElementById("timer");
+        const scoreText = document.getElementById("score-text");
+
+        // 1️⃣ دالة الضغط على زر "ابدأ التحدي"
+        function startQuiz() {
+            startScreen.classList.add("hidden"); // إخفاء شاشة الترحيب
+            quizBox.classList.remove("hidden");  // إظهار صندوق الأسئلة
+            loadQuiz();                         // تحميل أول سؤال
+        }
+
+        // دالة عرض السؤال وبدء العداد
+        function loadQuiz() {
+            resetState();
+            clearInterval(timerInterval); 
+
+            let currentQuiz = quizData[currentQuestionIndex];
+            
+            progressElement.innerText = `السؤال: ${currentQuestionIndex + 1} / 30`;
+            liveScoreElement.innerText = `الدرجة الحالية: ${score} / 30`;
+            
+            levelTitleElement.innerText = `المستوى: ${currentQuiz.lvl}`;
+            levelTitleElement.className = `level-badge lvl-${currentQuiz.lvlIdx}`;
+
+            questionElement.innerText = currentQuiz.q;
+
+            currentQuiz.o.forEach((option, index) => {
+                const button = document.createElement("button");
+                button.innerText = option;
+                button.classList.add("option-btn");
+                button.addEventListener("click", () => selectAnswer(index));
+                optionsContainer.appendChild(button);
+            });
+
+            // ضبط عداد الـ 7 ثوانٍ
+            timeLeft = 7;
+            timerElement.innerText = timeLeft;
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function resetState() {
+            optionsContainer.innerHTML = "";
+        }
+
+        // دالة العداد التنازلي
+        function updateTimer() {
+            timeLeft--;
+            timerElement.innerText = timeLeft;
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                score--; // خصم درجة لانتهاء الوقت
+                nextQuestion();
+            }
+        }
+
+        // دالة فحص الإجابة المختارة
+        function selectAnswer(selectedIndex) {
+            clearInterval(timerInterval); 
+            let currentQuiz = quizData[currentQuestionIndex];
+            
+            if (selectedIndex !== currentQuiz.c) {
+                score--; // خصم درجة للإجابة الخاطئة
+            }
+
+            nextQuestion();
+        }
+
+        // الانتقال أو إنهاء اللعبة
+        function nextQuestion() {
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < quizData.length) {
+                loadQuiz();
+            } else {
+                showResults();
+            }
+        }
+
+        // 2️⃣ دالة إظهار المجموع الكلي النهائي
+        function showResults() {
+            clearInterval(timerInterval);
+            quizBox.classList.add("hidden");
+            resultBox.classList.remove("hidden");
+            scoreText.innerText = `${score} من 30`;
+        }
+
+        // دالة إعادة بدء المسابقة
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 30;
+            resultBox.classList.add("hidden");
+            quizBox.classList.remove("hidden");
+            loadQuiz();
+        }
+    </script>
+</body>
+</html>
